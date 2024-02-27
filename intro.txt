@@ -1,0 +1,232 @@
+
+- vamos a comenzar a hacer un CRUD con una API falsa. es decir cargar en la memoria los objetos json
+- todo esto porque en este primer CRUD van a quedar claros todos los conceptos anteriormente explorados como: props, events, state, components, reutilización de esos conceptos como base
+  para el segundo CRUD.
+- De esta forma, quedará demostrado que si se aplican las buenas prácticas desde el comienzo, cuando se tengan components que se puedan aplicar para otras apps, o cuando la misma app se
+  vaya haciendo más compleja, si desde el principio se parte desde una base sólida, despues voy a poder reurilizar el código previamente hecho
+
+# Pasos:
+ Lectura del CRUD:
+
+1. Creacion de Componentes y Renderfizado de datos:
+- En mi App.jsx, debo eliminar todo lo que no deseemos que se renderice (logo, div, reloj)
+- Elimino App.css, el logo React, el logo vite, el contenido de index.css
+- Creo el directorio components, y dentro el archivo CrudApp.jsx
+  # Comando
+- con el comando rfc, creo el Componente funcional (con el exopor default y la importación de React al comienzo)
+- Para el useState el atajo sería useS y me generara el snnipet, cuando tipee el nombre del state , si quiero que en el set, el nombre se transforme en camellcase, debo usar el tabla
+  y automáticamente se pasa a mayúscula el nombre en el set
+
+- Los datos de la API (falsa / local) los voy a mandar a llamar desde una variable (initialDb) que traerá la data inicial , que va a contener los datos de los cab. del sodíaco, con su 
+  id, nombre y constelación 
+  OJO: es lo mismo a como lo hago cuando quiero hacer la consulta API Rest con fetch, pero en vez de hacer el proceso, simulo el mismo con un json ya en CrudApp
+- Estos datos (de inicialización falsa) siempre van a ir fuera del componente (CrudApp)
+- Para mostrar mi data, voy a necesitar un <form> y una <table>, por lo cual debo crear los componentes respectivos,  aparte y en el return de mi Componente CrudApp dichas etiquetas jsx
+  donde se van a renderizar los componentes creados en ficheros aparte.
+-
+  # componente CrudForm:
+- Creo el archivo CrudForm.jsx, y dentro el componente CrudForm
+- Creo el elemento <form> con 4 input. Los primeros dos de tipo text. En los inputs de tipo text, le proporciono el className ="name / constellation" y  en  el 
+  earia-placeholder = "Nombre / Constelación"
+   
+- Los otros dos inputs son, uno de tipo submit y el otro de tipo reset.
+  OJO: Ésto último porque vamos a trabajar los procesos  de creación, lectura y por último la actualización del CRUD con el mismo form, para simplificar código lo más que se pueda
+- En la propiedad "value" la inicializaré, los valores form.name y form.constellation, que son  los valores que me llegarán de la asociación o referencia con la data de la API consultada
+- En el CRUD realizado en JS course, yo necesite de un input oculto para el reseteado del form, pero acá no se va a necesitar, porque  se va a manejar  y gestionar con la var de state 
+  los cambios en los registros de cada caballero y  el reseteado
+- Luego en mi componente CrudForm debemos generar algunos eventos, onSubmit para el <form> y el botón reset, tambien le paso el handler del evento respectivo  a cada uno 
+  (handlerSubmit y handlerReset), onChange para los inputs, el handlerchange para ambos. 
+- De esta forma, al de cambiar el value de los inputs, se produce el evento onChange en cada uno de ellos, el mismo  efectuará el cambio de estado desde el handler (handlechange) 
+  (que desarrollaremos después) y al darle click al botón submit, se activará el evento onSubmit, controlado por el handler (handleSubmit) y se ejecutarán, tanto el la creación y la lectura
+   del form que se van a enviar al CrudApp.
+- De igual manera, cuando se le dé click al botón reset, se va a activar el evento onSubmit de este botón, que va a ser controlado por el handler, handlerReset, que va a limpiar el form y 
+  el state de de la app. 
+
+- Tambien, debo crear la estructura del objeto (InitialForm), con el que va a comenzar mi inicializacion falsa que quiero para el CRUD de los datos  que se van a leer en la API falsa.
+  De esta forma, en lugar de que cargue el initialState como un objeto vacío, lo cargamos con el initalForm.
+- La var initialForm va a ser un objeto que tenga como atributos el name, constellation y el id de los caballeros del sodíaco. Este objeto de inicialización, va fuera del componente,
+  con valores vacios para los strings (nombre y constelación) y null (id)
+- Para manejar los cambios en los inputs del form, en sus estados, necesito crear una var de state (form / setForm), a la que en su useState debo ingresarle como propiedad el initialForm, 
+  para que de esta manera se asocien con él a los elementos <inputs> en su propiedad value (value ={form.name} o value ={constellation}) y el initial state, como lo mencionamos antes, 
+  inicalizado con el objeto initalForm, para evitar que me genere errores al referenciar con el value de los inputs, por que el objeto form no existe.
+  OJO: como vamos a trabajar con vars de state, lo debo importar. tambien el useEffect.
+- Luego al compoenete CrudForm, lo mando a llamar desde el return del componente padre CrudApp
+
+# Componente CrudTable:
+- creo el arvivo .jsx y lo importo en el CrudApp.jsx
+- Le creamos el titulo con un <h3>
+- creamos el elementotable, dentro, el <tHead>, dentro una <tr>, que a su vez tendría 3 <th>
+- en el <tbody>, un <tr> con tres <td>, los últimos con las leyendas Jon y Géminis para los dos primeros <td> y en el ultimo <td>, dos <button> con las leyendas Editar y Limpiar
+ respectivamente 
+
+ # Importante #
+  Agregar data de forma dinámica: 
+- A esta altura, la tabla va a mostrar un solo registro estático (Jon Géminis Agregar Limpiar). Para Agregar los demas Caballeros de forma dinámica, debo trabajar con las props.
+- En mi componente <CrudApp>, creo un var de state (db / setDb) y la inicializo (initialState) con el objeto que contiene la API falsa (initialDb) 
+- En mi componente <CrudTable> paso por parametro una prop con la destructuración {data} 
+- En el <tbody> de mi tabla, voy a generar el código para agregar los datos de los caballeros dinámicamente
+- Yo puedo facilmente, generar un componente  <CrudTableRow> que va a contener solo el  elementos <tr>, del <tbody> (los corto y los pego en <CrudTableRow>) de mi <CrudTable> e 
+  importarlo desde mi <CrudTable> 
+- solo la fila del nombre, constelación y los botones Agregar y Limpiar
+
+  Validación para Agregar la data de los caballeros 
+
+- Para Hacer la validación debejos imaginar que la data (initialDb del componente <CrudApp>) está vacía. Entoces debemos validar, preguntando en un conditional render  en el <tbody>
+  que me diga  si la si no hay data (si su longitud es igual a cero) {data.length === 0} ,  entoces (?) generá un <tr> con una <td colSpan="3"> que digan "Sin datos" 
+  OJO: colSpan*3 para que las celdas de la tabla  tengan la leyenda
+- Si no (:), va a recorrer la data (con un data.map()) y a cada elemento de data (e), va a renderizar el elemento <CrudTableRow>
+- es muy importante que  al CrudTableRow se le agregue como prop el atributo Key, que se extrae, generalmente del atributo id de la data, en el mapeo (<CrudTableRow key={el.id}>)
+- Tambien, como prop le paso el atributo el = {el}
+- De esta forma solo me va a mostrar lo que está dibujado por defecto en mi CrudApp. 
+- Para que me renderice cada elemento en mi App, debo irme a CrudTableRow y en el textCont de las <td> debo sustituir po {el.name} y {el.constellation} respectivamente 
+
+
+Actualuzación del CRUD:
+
+# Inserción de Datos:
+
+- Vamo a crear tres funciones que nos van a servir para actualizar cada una de estas peticiones al CRUD
+
+1. CreateDAta(): 
+  - Va a crear un nuevo registros en la base de datos falsa.
+  - va a tener como parametro la data createData(data){}
+
+2. UpdateData():
+  - Va a actualizar los registros en la base de  datos falsa
+  - Va a recibir como parametro la data, para hacer la actualización de la db falsa updateData(data)
+
+3. DeleteData():
+  - Va a borrar los registros de la base de datos false
+  - Va a recibir como parametro el id, que es solo lo necesario para borrar el registro de la db falsa deleteData(id)
+
+- Ahora, como solo voy a trabajar con un form, reutilizado, tanto para la lectura, como para la actualización, creo una var de state (dataToEdit / setDataToEdit) y como initialState va 
+  a tener el valor null.
+- dataToEdit, es una var de state que la voy a utilizar cuando quiera tomar datos que ya existen y actualizarlos y no hacer con los mismos una creación
+- Esto quiere decir, que cuando la data sea null, se puede insertar (create) y cuando no, se va a actualizar (update)
+- Estas tres funciones (updateData, deleteData createData) y la variable de state (dataToEdit) se van a ejecutar en los componente hijos de CrudApp (CrudForm y CrudTable)
+- Tanto createData, como updateData van a ser pasados como props del CrudForm. En el caso de deleteData, no, porque la misma, en el componente <Form> no contiene los botones de editar y 
+  eliminar.
+- Sin embargo, como se tiene que identificar si el registro se tiene que crear (ejecutar una inserción) o actualizar, se debe agregar como prop la var de state dataToEdit y la funcion 
+  que la actualiza,  el metodo setDataToEdit
+- Todo esto se va a identificar con el evento submit del form, de esta manera, el form recibe esas funcionalidades del respectivo CRUD a ser ejecutadas y la var de state para identificar 
+  que funcionalidad le corresponde, dependiendo del valor de su initialState
+- La tabla <CrudTable>, por el contrario, recibe el metodo setDataToEdit, para que cuando presionemos   el botón de editar, el registro se traslade al form (llenando los inputs), tambien,
+  el metodo delete (deleteData) para eliminar el registro seleccionado.
+
+- Lo primero que debo hacer es una actualización. Me voy al CrudForm y de lo que debo estar conciente es, de que cuando el form se procese, es cuando se agregua un nuevo registro al 
+  mismo (llenar los inputs y darle click al submit). 
+- Entonces la tabla tambien tendría que renderizarse. Por lo que nos conviene trabajar con el onSubmit.
+
+# evento handleChange: (Actualizar los datos del <Form>)
+
+- Pero antes de trabajar con el onSubmit, hay que recordar que los inputs de tipo texto tienen la funcion handlechange, que es para actualizar. Debo cerciorarme de que cuando se le ingrese
+  algun valor al input (name o constellation), el valor del mismo va a actualizarse en la var de state form, en dichas propiedades (form.name o form.constellation).
+- Estos elementos del form están controlados por la var de state (form / setForm)
+- Así que,  el evento handlechange, en los inputs, lo que va a hacer es actualizar la var de state ( con el metodo setForm), con un spread operator del  valor de la misma var (...form), 
+  con la destructuración del  target del nombre de en ambas inputs que posean las propiedades [e.target.name] y su respectivo value e.target.value
+   OJO: LA destructuración es de name y value, atributos de ambos inputs (name y constellation)
+    EG: setForm({ ...form, [e.target.name]: e.target.value})
+    En conclusión, voy a construir un objeto en el que la propiedad name de los inputs, la tome como atributo del objeto que estoy construyendo y le de su respectivo valor y con eso
+    ya hago que cuando ingrese un dato en el input, ese cambio seva a reflejar en el state del componente
+
+# evento handleSubmit (form):
+- Terminado el handlechange, ahora si puedo avocarme al evento submit. lo primero es el metodo preventDefault del evento e.preventDefault(), para que no se autoprocese el mismo.
+- En esta fase debería aplicarse un número amplio de validaciones, pero, no es el objetivo de este ejercicio. Sin embargo, se  van a ahacer algunas.
+- Para que el value no esté vacío, lo puedo hacer desde el atributo required, pero lo voy a hacer con JS. Entonces, para comenzar a hacer esto, debo estar consciente de que el value de
+  cada input está guardado, en el atributo name, en la var de state (form / setForm). por lo que para validar si esta vacío, solo debe cumplirse la condición 
+  (!form.name || form.constellation), sin importar el .value, como si importa en el evento (e.target.value)
+- De ser así, mando un alert("Datos incompletos") y un return; con esto, no sigue procesando lo que haya dentro de la programación del form.
+- Ahora, si form.id === null (no es un registro ya creado), ahí invoco al método createData. Si por el contrario el form.id no está vacío, voy a trabajar con updateData, que es en los
+  casos cuando trabaje con los botones de Editar y eiminar   
+- Pero antes, debo recordar que el componente <Form> tiene como props (en el render de CrudApp),  los métodos y var asignados (createData, updateData, dataToEdit y setDataToEdit)
+  para trabajar con él. 
+- Entonces, para facilitar el trabajo, los paso como props de mi componente, en una destructuración de cada uno ({createData, updateData, dataToEdit y setDataToEdit})
+- Al invocar a la función createData, debo pasarle como argumento la data con la que estoy trabajando, que es la del form. Así, en el CrudApp, en la misma función (createData),que recibe
+  por parametro data,se hará la asociación de form (en mi componente <Form>) con data de mi <CrudApp>
+- Caso contrario, paso updateData(form).
+- Despues hago el limpiado del formulario  con el llamado de la función handlerReset(); 
+
+# Evento handlerReset (form):
+- Cuando yo le dé click button Limpiar, el mismo invocará a la función handleReset, para que despues que se envíe, el form, en sus inputs quede liberado de 
+  vuelta y así poder seguir llenandolo con más registros (caballeros) 
+- Para esto, hay que limpiar el form, pero, el mismo está controlado por la var de state, asi que vamos a trabajar con el setForm y como parametro, la var de inicio del form (initialForm)
+- para resetear el form debo trabajar con dataToEdit, debo setearlo (setDataToEdit) y volver su valor a null setDataToEdit(null)
+- Así cuando luego de enviarlo, en mi componente, se limpiará el registro (handleReset), pero no creará ningún registro.
+
+ # createData() (CrudApp)
+- Para crear (desde CrudApp) un registro (caballero), se debe trabajar con la funcion createData , en donde se va a setear el setDb (db falsa) y como es un array, le aplico el spread 
+  operator a db mas la data que me llega del <Form> por parametro de la función createData.
+  OJO: si envío un clg de data me va a mostrar el objeto solo con el nombre y la constelación. el id está con value = null. 
+- para el id, puedo hacer varias cosas, en aras de generar uno automáticamente. puedo trabajar con el objeto Date.now o descargando una dependencia que genere id unicos, como uniqueId.
+- de momento usaré el time stamp (marca de tiempo) Date.now, porque es una estampa de tiempo del segundo en el que estamos (lo que la hace único). es por eso que le asigno a data.id el
+  valor de Date.now()
+
+
+# UpdateData (llamado en el form):
+- Lo siguiente que hay que hacer es que cuando se le dé al botón de Editar, pase los daros de la tabla al formulario. es decir,  desde la CrudTable va a propagar hacia sus elementos padres
+  (CrudApp)  la acción, para después, afectar al formulario.
+- Acá vamos a trabajar paso de propiedades a través de eventos, desde los hijos a los padres.
+- Recordemos que CrudTable pasa la data, setDataToEdit ( lo que nos indica que se va a editar ) y  deleteData ( botón de eliminar)
+- Cuando nos vamos a CrudTable, nos damos cuanta que nos hace falta destructurar setDataToEdit y deleteData como props del la función
+- Estas props, se las debo pasar a nuestra CrudTableRow, tanto en el render de CrudTable, como en las props del componente CrudTableRow, destructuradas
+- LO siguiente, es hacer una destructuración de (el), asignandole los keys de (name, constellation, id), para que a la hora de llamarlo no use el.name, el. constellation, el.id
+- Luego, en el botón de editar, al darle click (onClick), debe llamar a la función setDataToEdit, que ejecutará dentro de una arrow function. 
+- Cuando esta función tenga como valor null, quiere decir que va a crear datos y cuando no, va a editar, y a la que le vamos a pasar (el), que es el objeto (name, constellation, id) que 
+  recibe los datos que van formando cada una de las rows de nuestra tabla.  
+- Lo mismo vamos a hacer con el botón delete, solo que en vez de updateData, va a ser deleteData, que está en CrudApp y recibe el id del elementoque va a eliminar
+ Importante:
+ - vamos a ver como se propaga hacia arribala propiedad (deleteData)
+ - Desde el CrudTableRow usamos deleteData es un metodo del componente CrudApp (padre), a la hora de pulsar el botón de eliminar, la prop deleteData, de nuevo, del componente <CrudApp>, 
+   le pasa el id de la fila en la que estemos, pero <CrudTableRow> está en <CrudTable>, que a su vez recibe  la prop deleteData del componente padre que es <CrudApp> 
+
+
+# dataToEdit:
+- En este punto, tenemos que lograr que al hacer click en el botón editar, se genere un efecto en el que el registro (caballero) que fue seleccionado a editar, pase a los inputs del form, 
+  para ser editado.
+- Ese esfecto se logra con useEffect. en el que vamos a indicar dos cosas:
+ 1. el parametro que ejecutará el useEffect, va a ser aplicado a la propiedad dataToEdit [dataToEdit]
+ 2. La validación de si existe dataToEdit, actualizaremos el registro seleccionado del form con un setForm y le pasaremos el atributo  dataToEdit.
+    - De esta forma la dataToEdit (los datos el caballero seleccionado en la tabla), pasasán  a los inputs del form
+    
+ 2.1 Si no hay dataToEdit, seteará el valor del form, con el del initalForm 
+- Esto es simplemente un paso de props, conectamos el click del botón editar, pasan a la tabla que es el elemento padre de los botones, de la tabla pasa a CrudApp que sería e padre 
+  de la tabla, la tabla pasa los datos como prop a su hijo, que es el form 
+
+# UpdateData (Funcion del CrudApp):
+- Cuando programamos el handlerSubmit del formulario, validamos que si el form.id === null, Entonces ejecutara un createData, caso contrario, un updateData. Ahora es momento de programar la
+  función para actualizar el estado.
+-  Lo que habría que actualizar es el state de la variable db (base de datos falsa)
+- Como la var de state db es un array, lo que debo hacer es crear una nueva var (newData), en donde haga un mapeo de db (db.map) para corroborar si el elemento id de db (el.id) es igual al id
+  de la data que nos llega como Argumento, sustituya newData por data (la que nos llega del form), si no, newData tendrá el mismo valor que el elemento que coincide en el id (el)
+  let newData = db.map(el => el.id === data.id?data:el)
+- Luego debo actualizar db con la newData:   setDb(newData)
+
+IMportante:
+En conclusión, si desde CrudTableRow el usuario hace click en el botón editar de cualquier registro, ese elemento, va a pasar a ser dibujado en la tabla (CrudTable), quien a su vez lo envíará
+ al CrudApp, refrenciado con la db al dataToEdit pasado al form por parametro, y que es evaluado desde un useEffect, en el que pone el foco en los cambios de dataToEdit (existe o no) y 
+ dependiendo de eso, actualiza el state de la prop dataToEdit o con le da los valores iniciales (initialForm) del form
+
+# Cambiar de Agregar a Editar en el <h3>:
+- Cuando hago click en el botón de Editar, tambien el necesario que el <h3> que contiene la leyenda "agregar", en el <form> cambie  a Editar
+- Todo esto lo hago aplicando un conditional render dentro del <h3> que contiene el texto agregar, que va a depender, del cambio de la var dataToEdit. si hay dataToEdit, cambio el texto por
+  'Editar', si no hay dataToEdit, 'Agregar'. con un simple operador ternario  {dataToEdit? 'Editar': 'Agregar'}
+ 
+# DeleteData:
+- Cuando se presiona el botón Eliminar en en el CrudTableRow, el evento va a mandar a llamar a la función deleteData, que a su vez va a recibir id del elemento para borrarlo.
+- Por ese motivo (recibir un argumento) el llamado a la función deleteData, se hace dentro de una arrow function.
+- ese función (deleteData) es pasada desde CrudTable como una prop a <CrudTableRow>, junto con el id de la data que mapea.
+- La función DeleteData  tambien es pasada a CrudTable desde CrudApp con el id como parametro. entonces desde CrudApp hay que hacer la eliminación.
+- Siempre para eliminar un elemento hay que consultar si se desea hacerlo. para eso creo una var  (isDelete), en la que va a ser un confirm, con la pregunta ¿Estás seguro de eliminar el
+  registro con el id, ${id}?
+  EG:    let isDelete = window.confirm(`¿Estás seguro de eliminar el registro con el id,${id} ?`);
+
+- ahora sabiendo que isDelete, como es un confirm, es un tipo de dato booleano, (aceptar / cancelar), procedo a hacer la validación.
+- si isDelete is true, creo una var (newData),que va a ser la db, pero que la voy a recorrer, para filtrar (metodo .filter) los registros que no coincidan en el id con el indicado , los guarde
+  en la var data y el que no, lo deje como el elemento (el).
+   if(isDelete){
+    let newData = db.filter(el => el.id !== id?data:el)
+   }
+   else{
+    return;
+   }
+
